@@ -1,51 +1,52 @@
 import React from "react";
 import {
-  Container,
-  Header,
-  Menu,
-  Button,
-  List,
-  Image
+  Menu
 } from "semantic-ui-react";
 
-function App() {
-  return (
-    <div>
-      <Menu inverted>
-        <Menu.Item header>Bookliker</Menu.Item>
-      </Menu>
-      <main>
-        <Menu vertical inverted>
-          <Menu.Item as={"a"} onClick={e => console.log("book clicked!")}>
-            Book title
-          </Menu.Item>
+import BookList from './Containers/BookList'
+import BookCard from './Components/BookCard'
+
+class App extends React.Component {
+
+  state = {
+    books: [],
+    currentBook: ''
+  }
+
+  componentDidMount() {
+      fetch('http://localhost:3000/books')
+      .then(resp => resp.json())
+      .then(books => this.setState(prevState => {
+          return {
+            books: books
+          }
+      }))
+  }
+
+  handleBookCardUpdate = (book) => {
+    this.setState({currentBook: book})
+  }
+
+  render() {
+    return (
+      <div>
+        <Menu inverted>
+          <Menu.Item header>Bookliker</Menu.Item>
         </Menu>
-        <Container text>
-          <Header>Book title</Header>
-          <Image
-            src="https://react.semantic-ui.com/images/wireframe/image.png"
-            size="small"
-          />
-          <p>Book description</p>
-          <Button
-            color="red"
-            content="Like"
-            icon="heart"
-            label={{
-              basic: true,
-              color: "red",
-              pointing: "left",
-              content: "2,048"
-            }}
-          />
-          <Header>Liked by</Header>
-          <List>
-            <List.Item icon="user" content="User name" />
-          </List>
-        </Container>
-      </main>
-    </div>
-  );
+        <main>
+          <Menu vertical inverted>
+            <Menu.Item as={"a"}>
+              <BookList books={this.state.books} handleBookCardUpdate={this.handleBookCardUpdate}/>
+            </Menu.Item>
+          </Menu>
+          {this.state.currentBook ? <BookCard currentBook={this.state.currentBook}/>: null}
+        </main>
+      </div>
+    );
+  }
+
 }
 
 export default App;
+
+// onClick={e => console.log("book clicked!")}
